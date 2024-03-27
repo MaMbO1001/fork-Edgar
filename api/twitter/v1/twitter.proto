@@ -1,0 +1,99 @@
+syntax = "proto3";
+
+option go_package = "blablablashka/api/v1";
+
+package twit;
+import "google/rpc/code.proto";
+import "buf/validate/validate.proto";
+
+message TwitByAuthorsRequest {
+  string author_id = 1 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 50
+  }];
+  int32 limit = 2;
+  int32 offset = 3;
+}
+
+message TwitByAuthorsResponse {
+  repeated Twit twits = 1;
+  int32 total = 2;
+}
+
+message  Twit {
+  string  author_id = 1 [(buf.validate.field).string = {
+    min_len: 5,
+    max_len: 18
+  }];
+
+  string id = 2 [(buf.validate.field).string = {uuid: true}];
+  string text = 3 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 500
+  }];
+}
+
+message  UpdateTwitRequest {
+  string id = 1;
+ string Twit = 2 [(buf.validate.field).string = {
+   min_len: 1,
+   max_len: 500
+ }];
+}
+
+message  UpdateTwitResponse {
+  Twit twit = 1;
+}
+
+message DeleteTwitRequest{
+   string id = 1;
+}
+
+message DeleteTwitResponse {}
+
+service Start {
+  rpc TwitByAuthors(TwitByAuthorsRequest) returns (TwitByAuthorsResponse) {
+    option (google.api.http) = {get: "twit/api/v1/authors"};
+    option (api.annotations.v1.method_rule) = {
+      codes: [
+        INVALID_ARGUMENT,
+        NOT_FOUND
+      ]
+    };
+  }
+
+  rpc UpdateTwit(UpdateTwitRequest) returns (UpdateTwitResponse) {
+    option (google.api.http) = {
+      put:"twit/api/v1/twit",
+      body: "*"
+    };
+    option (api.annotations.v1.method_rule) = {
+      codes: [
+        INVALID_ARGUMENT,
+        NOT_FOUND
+      ]
+    };
+  }
+
+  rpc DeleteTwit(DeleteTwitRequest) returns (DeleteTwitResponse) {
+    option (google.api.http) = {delete: "twit/api/v1/delete"};
+    option (api.annotations.v1.method_rule) = {
+      codes: [
+        INVALID_ARGUMENT,
+        NOT_FOUND
+      ]
+    };
+  }
+
+  rpc CreateTwit(CreateTwitRequest) returns (CreateTwitResponse) {
+    option (google.api.http) = {
+      post: "/user/api/v1/user",
+      body: "*"
+    };
+    option (api.annotations.v1.method_rule) = {
+      codes: [
+        INVALID_ARGUMENT
+      ]
+    };
+  }
+}
