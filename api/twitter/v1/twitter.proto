@@ -51,6 +51,17 @@ message DeleteTwitRequest{
 
 message DeleteTwitResponse {}
 
+message CreateTwitRequest {
+  string twit = 1 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 500
+  }];
+}
+
+message CreateTwitResponse {
+  string id = 1 [(buf.validate.field).string = {uuid: true}];
+}
+
 service Start {
   rpc TwitByAuthors(TwitByAuthorsRequest) returns (TwitByAuthorsResponse) {
     option (google.api.http) = {get: "twit/api/v1/authors"};
@@ -92,7 +103,8 @@ service Start {
     };
     option (api.annotations.v1.method_rule) = {
       codes: [
-        INVALID_ARGUMENT
+        INVALID_ARGUMENT,
+        NOT_FOUND
       ]
     };
   }
