@@ -14,7 +14,7 @@ type (
 		FileInfoRepo
 		TaskRepo
 		// Tx starts transaction in database.
-		// Errors: unknown.
+		// Errors: unknown.x
 		Tx(ctx context.Context, f func(Repo) error) error
 		// Save adds to the new user to repository.
 		// Errors: ErrEmailExist, ErrUsernameExist, unknown.

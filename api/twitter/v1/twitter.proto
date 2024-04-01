@@ -6,25 +6,20 @@ package twit;
 import "google/rpc/code.proto";
 import "buf/validate/validate.proto";
 
-message TwitByAuthorsRequest {
-  string author_id = 1 [(buf.validate.field).string = {
-    min_len: 1,
-    max_len: 50
-  }];
+message TwitByAuthorRequest {
+  string author_id = 1;
   int32 limit = 2;
   int32 offset = 3;
 }
 
-message TwitByAuthorsResponse {
+message TwitByAuthorResponse {
   repeated Twit twits = 1;
   int32 total = 2;
 }
 
 message  Twit {
-  string  author_id = 1 [(buf.validate.field).string = {
-    min_len: 5,
-    max_len: 18
-  }];
+  string  author_id = 1 [(buf.validate.field).string = {uuid: true}];
+
 
   string id = 2 [(buf.validate.field).string = {uuid: true}];
   string text = 3 [(buf.validate.field).string = {
@@ -63,8 +58,8 @@ message CreateTwitResponse {
 }
 
 service Start {
-  rpc TwitByAuthors(TwitByAuthorsRequest) returns (TwitByAuthorsResponse) {
-    option (google.api.http) = {get: "twit/api/v1/authors"};
+  rpc TwitByAuthors(TwitByAuthorRequest) returns (TwitByAuthorResponse) {
+    option (google.api.http) = {get: "twit/api/v1/author"};
     option (api.annotations.v1.method_rule) = {
       codes: [
         INVALID_ARGUMENT,
@@ -98,13 +93,12 @@ service Start {
 
   rpc CreateTwit(CreateTwitRequest) returns (CreateTwitResponse) {
     option (google.api.http) = {
-      post: "/user/api/v1/user",
+      post: "/twit/api/v1/twit",
       body: "*"
     };
     option (api.annotations.v1.method_rule) = {
       codes: [
-        INVALID_ARGUMENT,
-        NOT_FOUND
+        INVALID_ARGUMENT
       ]
     };
   }
