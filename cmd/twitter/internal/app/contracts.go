@@ -7,9 +7,9 @@ import (
 
 type (
 	Repo interface {
-		TwitByAuthors(context.Context, uuid.UUID) (*Twit, error)
-		UpdateTwit(context.Context, Twit) (*Twit, error)
-		DeleteTwit(ctx context.Context, id uuid.UUID) error
-		CreateTwit(context.Context, Twit) (uuid.UUID, error)
+		ByAuthor(context.Context, uuid.UUID) (*Twit, error)
+		Update(ctx context.Context, ID uuid.UUID, text string) (*Twit, error)
+		Delete(ctx context.Context, ID uuid.UUID) error
+		Create(context.Context, Twit) (*Twit, error)
 	}
 )
