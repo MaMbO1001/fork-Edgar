@@ -6,7 +6,7 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-func (a *App) TwitByAuthor(ctx context.Context, authorID uuid.UUID) (*Twit, error) {
+func (a *App) TwitByAuthor(ctx context.Context, authorID uuid.UUID) (twit []Twit, err error) {
 	j, err := a.repo.ByAuthor(ctx, authorID)
 	if err != nil {
 		return nil, fmt.Errorf("a.repo.ByAuthor: %w", err)
@@ -22,8 +22,8 @@ func (a *App) CreateTwit(ctx context.Context, twit Twit) (*Twit, error) {
 	return j, nil
 }
 
-func (a *App) UpdateTwit(ctx context.Context, ID uuid.UUID, text string) (*Twit, error) {
-	j, err := a.repo.Update(ctx, ID, text)
+func (a *App) UpdateTwit(ctx context.Context, twit Twit) (*Twit, error) {
+	j, err := a.repo.Update(ctx, twit)
 	if err != nil {
 		return nil, fmt.Errorf("a.repo.Update: %w", err)
 	}
