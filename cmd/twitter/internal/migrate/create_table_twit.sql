@@ -3,8 +3,8 @@ create table twit
     ID       uuid not null default gen_random_uuid(),
     AuthorID uuid not null,
     Text     text not null,
+    CreatedAt time.Time,
+    UpdatedAt time.Time,
 
-    unique (Text),
-    primary key (ID),
-    primary key (AuthorID)
+    primary key (ID)
 )

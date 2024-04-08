@@ -1,6 +1,9 @@
 package app
 
-import "github.com/gofrs/uuid"
+import (
+	"github.com/gofrs/uuid"
+	"time"
+)
 
 type (
 	SearchParams struct {
@@ -9,8 +12,10 @@ type (
 	}
 
 	Twit struct {
-		AuthorID uuid.UUID
-		ID       uuid.UUID
-		Text     string
+		AuthorID  uuid.UUID
+		ID        uuid.UUID
+		Text      string
+		CreatedAt time.Time
+		UpdatedAt time.Time
 	}
 )

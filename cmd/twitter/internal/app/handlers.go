@@ -6,12 +6,12 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-func (a *App) TwitByAuthor(ctx context.Context, authorID uuid.UUID) (twit []Twit, err error) {
-	j, err := a.repo.ByAuthor(ctx, authorID)
+func (a *App) TwitByAuthor(ctx context.Context, authorID uuid.UUID) (total int, twit []Twit, err error) {
+	total, twit, err = a.repo.ByAuthor(ctx, authorID)
 	if err != nil {
-		return nil, fmt.Errorf("a.repo.ByAuthor: %w", err)
+		return total, nil, fmt.Errorf("a.repo.ByAuthor: %w", err)
 	}
-	return j, nil
+	return total, twit, nil
 }
 
 func (a *App) CreateTwit(ctx context.Context, twit Twit) (*Twit, error) {
