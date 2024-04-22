@@ -1,10 +1,10 @@
 create table twit
 (
-    ID       uuid not null default gen_random_uuid(),
+    id      uuid not null default gen_random_uuid(),
     author_id uuid not null,
     text     text not null,
-    createdAt time.Time,
-    updatedAt time.Time,
+    created_at time.Time,
+    updated_at time.Time,
 
-    primary key (ID)
+    primary key (id)
 )

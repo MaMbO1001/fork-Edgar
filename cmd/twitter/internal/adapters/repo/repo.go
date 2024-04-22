@@ -67,20 +67,24 @@ func (r *Repo) Create(ctx context.Context, t app.Twit) (twits *app.Twit, err err
 		const query = `
 		insert into
 		twit
-			(text)
+			(text, author_id)
 		values 
-		    ($1)
+		    ($1, $2)
 		    returning id
 		`
-		err := db.GetContext(ctx, &twits, query, newTwit.Text)
+
+		var crea twit
+		err := db.GetContext(ctx, &crea, query, newTwit.Text)
 		if err != nil {
 			return fmt.Errorf("db.GetContext: %w", convertErr(err))
 		}
 
+		twits = crea.convert()
+
 		return nil
 	})
 	if err != nil {
-		return twits, err
+		return nil, err
 	}
 
 	return twits, nil
@@ -93,7 +97,7 @@ func (r *Repo) Update(ctx context.Context, t app.Twit) (upTwit *app.Twit, err er
 		update twits
 		set
 		text = $1,
-		updatedAt = now()
+		updated_at = now()
 		where id = $2
 		returning *`
 
@@ -129,23 +133,67 @@ func (r *Repo) Delete(ctx context.Context, id uuid.UUID) error {
 	})
 }
 
-func (r *Repo) ByAuthor(ctx context.Context, AuthorId uuid.UUID) (total int, t []app.Twit, err error) {
+func (r *Repo) ByAuthor(ctx context.Context, authorId uuid.UUID, limit int, offset int) (t []app.Twit, total int, err error) {
 	err = r.sql.NoTx(func(db *sqlx.DB) error {
-		const query = `select * from twits where authorId = any($1)`
+		const query = `select * from twits where author_id = $1
+		limit $2 offset $3`
 
-		const getTotal = `select count(*) over() as total from twits where authorId = $1`
+		const gettotal = `select count(*) from twits where author_id = $1`
 
-		res := twit{}
-		err := db.GetContext(ctx, res, query, getTotal, AuthorId)
+		res := []twit{}
+		err := db.SelectContext(ctx, &res, query, authorId, limit, offset)
+		if err != nil {
+			return fmt.Errorf("db.SelectContext: %w", convertErr(err))
+		}
+		for _, ff := range res {
+			t = append(t, *ff.convert())
+		}
+
+		err = db.GetContext(ctx, &total, gettotal, authorId)
 		if err != nil {
 			return fmt.Errorf("db.GetContext: %w", convertErr(err))
 		}
-
 		return nil
 	})
 	if err != nil {
-		return 0, t, err
+		return t, 0, err
 	}
 
-	return total, nil, err
+	return nil, total, err
 }
+
+func (r *Repo) GetTotalAllTwit(ctx context.Context) (total int, err error) {
+	err = r.sql.NoTx(func(db *sqlx.DB) error {
+		const query = `select count(*) from twits`
+
+		err = db.GetContext(ctx, &total, query)
+		if err != nil {
+			return fmt.Errorf("db.GetContext: %w", convertErr(err))
+		}
+		return nil
+	})
+	return total, nil
+}
+
+func (r *Repo) GetAllTwitWithJopa(ctx context.Context) (t []app.Twit, err error) {
+	err = r.sql.NoTx(func(db *sqlx.DB) error {
+		const query = `select * FROM twit
+		WHERE text LIKE 'jopa%'`
+		res := []twit{}
+		err = db.GetContext(ctx, &res, query)
+		if err != nil {
+			return fmt.Errorf("db.GetContext: %w", convertErr(err))
+		}
+		for _, ff := range res {
+			t = append(t, *ff.convert())
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return nil, err
+}
+
+//сделать ручку GetTotalAllTwit которая возвращает цифру равную кол-ву всех твитов в бд
+//получить список всех твитов в ктороых есть слово "жопа" посмотреть в сторону sql like
