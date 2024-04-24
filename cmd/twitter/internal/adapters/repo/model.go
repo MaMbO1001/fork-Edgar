@@ -11,8 +11,8 @@ type (
 		AuthorID  uuid.UUID `db:"author_id" json:"author_id"`
 		ID        uuid.UUID `db:"id" json:"id"`
 		Text      string    `db:"text" json:"text"`
-		CreatedAt time.Time `db:"createdAt" json:"createdAt"`
-		UpdatedAt time.Time `db:"updatedAt" json:"updatedAt"`
+		CreatedAt time.Time `db:"created_at" json:"createdAt"`
+		UpdatedAt time.Time `db:"updated_at" json:"updatedAt"`
 	}
 )
 
