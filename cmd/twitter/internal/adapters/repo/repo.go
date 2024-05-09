@@ -160,6 +160,21 @@ func (r *Repo) ByAuthor(ctx context.Context, authorId uuid.UUID, limit int, offs
 	return t, total, nil
 }
 
+func (r *Repo) GetTwitByID(ctx context.Context, Id uuid.UUID) (twit *app.Twit, err error) {
+	err = r.sql.NoTx(func(db *sqlx.DB) error {
+		const query = ` select * from twit where id = $1`
+		err := db.GetContext(ctx, &twit, query, Id)
+		if err != nil {
+			return fmt.Errorf("db.GetContext: %w", convertErr(err))
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return twit, nil
+}
+
 func (r *Repo) GetTotalAllTwit(ctx context.Context) (total int, err error) {
 	err = r.sql.NoTx(func(db *sqlx.DB) error {
 		const query = `select count(*) from twit`
@@ -192,6 +207,3 @@ func (r *Repo) GetAllTwitWithJopa(ctx context.Context) (t []app.Twit, err error)
 	}
 	return t, nil
 }
-
-//сделать ручку GetTotalAllTwit которая возвращает цифру равную кол-ву всех твитов в бд
-//получить список всех твитов в ктороых есть слово "жопа" посмотреть в сторону sql like
