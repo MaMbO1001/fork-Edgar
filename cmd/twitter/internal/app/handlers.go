@@ -32,7 +32,7 @@ func (a *App) UpdateTwit(ctx context.Context, session dom.Session, text string, 
 	if session.UserID != t.AuthorID || !session.Status.IsAdmin() {
 		return nil, ErrAccessDenied
 	}
-	j, err := a.repo.Update(ctx, text)
+	j, err := a.repo.Update(ctx, Twit{Text: text, AuthorID: session.UserID})
 	if err != nil {
 		return j, fmt.Errorf("a.repo.Update: %w", err)
 	}
