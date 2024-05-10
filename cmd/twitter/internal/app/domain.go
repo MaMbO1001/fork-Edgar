@@ -17,5 +17,6 @@ type (
 		Text      string
 		CreatedAt time.Time
 		UpdatedAt time.Time
+		Is_banned bool
 	}
 )
