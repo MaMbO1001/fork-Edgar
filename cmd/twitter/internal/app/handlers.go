@@ -16,8 +16,8 @@ func (a *App) TwitByAuthor(ctx context.Context, authorID uuid.UUID, limit int, o
 	return twit, total, nil
 }
 
-func (a *App) CreateTwit(ctx context.Context, text string, id uuid.UUID) (*Twit, error) {
-	j, err := a.repo.Create(ctx, text, id)
+func (a *App) CreateTwit(ctx context.Context, session dom.Session, text string) (*Twit, error) {
+	j, err := a.repo.Create(ctx, Twit{Text: text, AuthorID: session.UserID})
 	if err != nil {
 		return nil, fmt.Errorf("a.repo.Create: %w", err)
 	}
@@ -29,11 +29,12 @@ func (a *App) UpdateTwit(ctx context.Context, session dom.Session, text string, 
 	if err != nil {
 		return nil, fmt.Errorf("a.repo.GetTwitByID: %w", err)
 	}
-	if session.UserID != t.AuthorID || session.Status.IsAdmin() {
-		j, err := a.repo.Update(ctx, text)
-		if err != nil {
-			return j, fmt.Errorf("a.repo.Update: %w", err)
-		}
+	if session.UserID != t.AuthorID || !session.Status.IsAdmin() {
+		return nil, ErrAccessDenied
+	}
+	j, err := a.repo.Update(ctx, text)
+	if err != nil {
+		return j, fmt.Errorf("a.repo.Update: %w", err)
 	}
 	return t, nil
 }
@@ -43,30 +44,23 @@ func (a *App) DeleteTwit(ctx context.Context, session dom.Session, id uuid.UUID)
 	if err != nil {
 		return fmt.Errorf("a.repo.GetTwitByID: %w", err)
 	}
-	if session.UserID == t.AuthorID || session.Status.IsAdmin() {
-		err = a.repo.Delete(ctx, id)
-		if err != nil {
-			return fmt.Errorf("a.repo.Delete: %w", err)
-		}
+	if session.UserID != t.AuthorID || !session.Status.IsAdmin() {
+		return ErrAccessDenied
+	}
+	err = a.repo.Delete(ctx, id)
+	if err != nil {
+		return fmt.Errorf("a.repo.Delete: %w", err)
 	}
 	return nil
 }
 
-func (a *App) AdminCreateTwit(ctx context.Context, session dom.Session, text string, id uuid.UUID) (twit []Twit, err error) {
-	if session.Status.IsAdmin() {
-		j, err := a.repo.Create(ctx, text, id)
-		if err != nil {
-			return nil, fmt.Errorf("a.repo.Create: %w", err)
-		}
+func (a *App) AdminCreateTwit(ctx context.Context, session dom.Session, text string, authorID uuid.UUID) (*Twit, error) {
+	if !session.Status.IsAdmin() {
+		return nil, ErrAccessDenied
 	}
-	twit = append(twit, Twit{AuthorID: id, Text: text})
-	return twit, nil
+	j, err := a.repo.Create(ctx, Twit{Text: text, AuthorID: authorID})
+	if err != nil {
+		return nil, fmt.Errorf("a.repo.Create: %w", err)
+	}
+	return j, nil
 }
-
-// Дать возможность удалять не только владельцу но и админу, так же и обновлять.
-// Если твиты запрашивает владелец, то добавить еще один твит внизу с текстом жопа.
-// Создать метод AdminCreateTwit он создаёт новый твит за конкретным человеком, а не за владельцем сессии
-// Создание твита должно гарантировать что аворАЙДИ у твита будет равно владельцу сессии
-// Либо ошибка, либо значение
-// Приватные поля почитать.
-// в креате и апдейт поменять твит на текст
