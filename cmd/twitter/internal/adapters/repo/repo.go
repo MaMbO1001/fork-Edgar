@@ -88,7 +88,7 @@ func (r *Repo) Create(ctx context.Context, t app.Twit) (twits *app.Twit, err err
 	return twits, nil
 }
 
-func (r *Repo) Update(ctx context.Context, t app.Twit, isBanned bool) (upTwit *app.Twit, err error) {
+func (r *Repo) Update(ctx context.Context, t app.Twit) (upTwit *app.Twit, err error) {
 	err = r.sql.NoTx(func(db *sqlx.DB) error {
 		updateTwit := convert(t)
 		const query = `
@@ -96,12 +96,12 @@ func (r *Repo) Update(ctx context.Context, t app.Twit, isBanned bool) (upTwit *a
 		set
 		text = $1,
 		updated_at = now()
-		where id = $2
-		is_banned = $3
+		is_banned = $2
+		where id = $3
 		returning *`
 
 		var upd twit
-		err := db.GetContext(ctx, &upd, query, updateTwit.Text, updateTwit.ID, isBanned)
+		err := db.GetContext(ctx, &upd, query, updateTwit.Text, updateTwit.ID, updateTwit.Is_banned)
 		if err != nil {
 			return fmt.Errorf("db.GetContext: %w", convertErr(err))
 		}

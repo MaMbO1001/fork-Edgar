@@ -33,7 +33,7 @@ func (a *App) UpdateTwit(ctx context.Context, session dom.Session, text string, 
 		return nil, ErrAccessDenied
 	}
 	t.Text = text
-	j, err := a.repo.Update(ctx, *t, t.Is_banned)
+	j, err := a.repo.Update(ctx, *t)
 	if err != nil {
 		return j, fmt.Errorf("a.repo.Update: %w", err)
 	}
@@ -74,7 +74,7 @@ func (a *App) AdminBannedTwit(ctx context.Context, session dom.Session, id uuid.
 	if err != nil {
 		return nil, fmt.Errorf("a.repo.GetTwitByID: %w", err)
 	}
-	j, err := a.repo.Update(ctx, *t, t.Is_banned)
+	j, err := a.repo.Update(ctx, *t)
 	if err != nil {
 		return nil, fmt.Errorf("a.repo.Update: %w", err)
 	}
