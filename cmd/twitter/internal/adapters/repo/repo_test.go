@@ -20,6 +20,7 @@ func TestRepo_Smoke(t *testing.T) {
 		Text:      "Hello Jopa Edgara",
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
+		Is_banned: bool(false),
 	}
 
 	twitResCreate, err := r.Create(ctx, twit)
@@ -27,6 +28,8 @@ func TestRepo_Smoke(t *testing.T) {
 	assert.NotEmpty(twitResCreate.ID)
 	assert.NotEmpty(twitResCreate.CreatedAt)
 	assert.NotEmpty(twitResCreate.UpdatedAt)
+	//assert.NotEmpty(twitResCreate.Is_banned)
+	assert.False(twitResCreate.Is_banned)
 
 	twit.ID = twitResCreate.ID
 	twit.CreatedAt = twitResCreate.CreatedAt
@@ -40,10 +43,12 @@ func TestRepo_Smoke(t *testing.T) {
 	assert.Equal(twits, twitby)
 	assert.Len(twitby, 1)
 	assert.Equal(1, total)
+	twit.Is_banned = true
 
 	twitResUpd, err := r.Update(ctx, twit)
 	assert.NoError(err)
 	twit.UpdatedAt = twitResUpd.UpdatedAt
+	assert.True(twitResUpd.Is_banned)
 	assert.Equal(twit, *twitResUpd)
 	assert.NotEmpty(twitResUpd.ID)
 
@@ -54,6 +59,10 @@ func TestRepo_Smoke(t *testing.T) {
 	assert.Equal(twitts, twitby)
 	assert.Len(twitby, 1)
 	assert.Equal(1, total)
+
+	getid, err := r.GetTwitByID(ctx, twitResCreate.ID)
+	assert.NoError(err)
+	assert.NotEmpty(getid.ID)
 
 	err = r.Delete(ctx, twit.ID)
 	assert.NoError(err)

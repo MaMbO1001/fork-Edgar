@@ -95,13 +95,13 @@ func (r *Repo) Update(ctx context.Context, t app.Twit) (upTwit *app.Twit, err er
 		update twit
 		set
 		text = $1,
-		updated_at = now()
+		updated_at = now(),
 		is_banned = $2
 		where id = $3
 		returning *`
 
 		var upd twit
-		err := db.GetContext(ctx, &upd, query, updateTwit.Text, updateTwit.ID, updateTwit.Is_banned)
+		err := db.GetContext(ctx, &upd, query, updateTwit.Text, updateTwit.Is_banned, updateTwit.ID)
 		if err != nil {
 			return fmt.Errorf("db.GetContext: %w", convertErr(err))
 		}
@@ -155,16 +155,17 @@ func (r *Repo) ByAuthor(ctx context.Context, authorId uuid.UUID, limit int, offs
 		return nil
 	})
 	if err != nil {
-		return t, 0, err
+		return nil, 0, err
 	}
 
 	return t, total, nil
 }
 
-func (r *Repo) GetTwitByID(ctx context.Context, Id uuid.UUID) (twit *app.Twit, err error) {
+func (r *Repo) GetTwitByID(ctx context.Context, id uuid.UUID) (twitt *app.Twit, err error) {
+	twi := twit{}
 	err = r.sql.NoTx(func(db *sqlx.DB) error {
 		const query = ` select * from twit where id = $1`
-		err := db.GetContext(ctx, &twit, query, Id)
+		err := db.GetContext(ctx, &twi, query, id)
 		if err != nil {
 			return fmt.Errorf("db.GetContext: %w", convertErr(err))
 		}
@@ -173,7 +174,7 @@ func (r *Repo) GetTwitByID(ctx context.Context, Id uuid.UUID) (twit *app.Twit, e
 	if err != nil {
 		return nil, err
 	}
-	return twit, nil
+	return twi.convert(), nil
 }
 
 func (r *Repo) GetTotalAllTwit(ctx context.Context) (total int, err error) {

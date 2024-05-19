@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"fmt"
-	"github.com/ZergsLaw/back-template/cmd/twitter/internal/app"
 	"github.com/ZergsLaw/back-template/internal/dom"
 	"github.com/gofrs/uuid"
 )
@@ -30,7 +29,7 @@ func (a *App) UpdateComment(ctx context.Context, session dom.Session, text strin
 		return nil, fmt.Errorf("a.jopa.ByCommentID: %w", err)
 	}
 	if session.UserID != com.AuthorID {
-		return nil, app.ErrAccessDenied
+		return nil, ErrAccessDenied
 	}
 	com.Text = text
 	cop, err := a.jopa.UpdateComment(ctx, Comment{Text: text, AuthorID: session.UserID})
@@ -46,7 +45,7 @@ func (a *App) DeleteComment(ctx context.Context, session dom.Session, commentID 
 		return fmt.Errorf("a.jopa.ByCommentID: %w", err)
 	}
 	if session.UserID != com.AuthorID {
-		return app.ErrAccessDenied
+		return ErrAccessDenied
 	}
 	err = a.jopa.DeleteComment(ctx, commentID)
 	if err != nil {

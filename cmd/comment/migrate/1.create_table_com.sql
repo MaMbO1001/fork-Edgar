@@ -1,14 +1,14 @@
 -- up
-create table twit
+create table com
 (
     id         uuid      not null default gen_random_uuid(),
-    author_id  uuid      not null,
+    twit_id    uuid      not null default gen_random_uuid(),
     text       text      not null,
+    author_id  uuid      not null,
     created_at timestamp not null default now(),
     updated_at timestamp not null default now(),
-    is_banned  boolean   not null default false,
     primary key (id)
 );
 
 -- down
-drop table twit;
+drop table com;
