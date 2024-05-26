@@ -20,40 +20,41 @@ func TestRepo_Smoke(t *testing.T) {
 		Text:      "Hello Jopa Edgara",
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
-		Is_banned: bool(false),
+		IsBanned:  bool(false),
 	}
 
 	twitResCreate, err := r.Create(ctx, twit)
 	assert.NoError(err)
 	assert.NotEmpty(twitResCreate.ID)
+	assert.NotEmpty(twitResCreate.Text)
 	assert.NotEmpty(twitResCreate.CreatedAt)
 	assert.NotEmpty(twitResCreate.UpdatedAt)
-	//assert.NotEmpty(twitResCreate.Is_banned)
-	assert.False(twitResCreate.Is_banned)
+	//assert.NotEmpty(twitResCreate.IsBanned)
+	assert.True(twitResCreate.IsBanned)
 
 	twit.ID = twitResCreate.ID
+	twit.IsBanned = twitResCreate.IsBanned
 	twit.CreatedAt = twitResCreate.CreatedAt
 	twit.UpdatedAt = twitResCreate.UpdatedAt
 	assert.Equal(twit, *twitResCreate)
 
-	var twits []app.Twit
-	twits = append(twits, twit)
+	twits := []app.Twit{twit}
 	twitby, total, err := r.ByAuthor(ctx, twit.AuthorID, 10, 0)
 	assert.NoError(err)
 	assert.Equal(twits, twitby)
 	assert.Len(twitby, 1)
 	assert.Equal(1, total)
-	twit.Is_banned = true
+	twit.IsBanned = true
 
 	twitResUpd, err := r.Update(ctx, twit)
 	assert.NoError(err)
 	twit.UpdatedAt = twitResUpd.UpdatedAt
-	assert.True(twitResUpd.Is_banned)
+	twit.IsBanned = twitResUpd.IsBanned
+	assert.True(twitResUpd.IsBanned)
 	assert.Equal(twit, *twitResUpd)
 	assert.NotEmpty(twitResUpd.ID)
 
-	var twitts []app.Twit
-	twitts = append(twitts, twit)
+	twitts := []app.Twit{twit}
 	twitby, total, err = r.ByAuthor(ctx, twit.AuthorID, 10, 0)
 	assert.NoError(err)
 	assert.Equal(twitts, twitby)
@@ -66,4 +67,8 @@ func TestRepo_Smoke(t *testing.T) {
 
 	err = r.Delete(ctx, twit.ID)
 	assert.NoError(err)
+
+	jopa, err := r.GetAllTwitWithJopa(ctx)
+	assert.NoError(err)
+	assert.Empty(jopa)
 }

@@ -101,7 +101,7 @@ func (r *Repo) Update(ctx context.Context, t app.Twit) (upTwit *app.Twit, err er
 		returning *`
 
 		var upd twit
-		err := db.GetContext(ctx, &upd, query, updateTwit.Text, updateTwit.Is_banned, updateTwit.ID)
+		err := db.GetContext(ctx, &upd, query, updateTwit.Text, updateTwit.IsBanned, updateTwit.ID)
 		if err != nil {
 			return fmt.Errorf("db.GetContext: %w", convertErr(err))
 		}
@@ -190,14 +190,15 @@ func (r *Repo) GetTotalAllTwit(ctx context.Context) (total int, err error) {
 	return total, nil
 }
 
-func (r *Repo) GetAllTwitWithJopa(ctx context.Context) (t []app.Twit, err error) {
-	err = r.sql.NoTx(func(db *sqlx.DB) error {
+func (r *Repo) GetAllTwitWithJopa(ctx context.Context) ([]app.Twit, error) {
+	var t []app.Twit
+	err := r.sql.NoTx(func(db *sqlx.DB) error {
 		const query = `select * FROM twit
 		WHERE text LIKE '%jopa%'`
 		res := []twit{}
-		err = db.GetContext(ctx, &res, query)
+		err := db.SelectContext(ctx, &res, query)
 		if err != nil {
-			return fmt.Errorf("db.GetContext: %w", convertErr(err))
+			return fmt.Errorf("db.SelectContext: %w", convertErr(err))
 		}
 		for _, ff := range res {
 			t = append(t, *ff.convert())

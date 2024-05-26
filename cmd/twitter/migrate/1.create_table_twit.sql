@@ -6,7 +6,7 @@ create table twit
     text       text      not null,
     created_at timestamp not null default now(),
     updated_at timestamp not null default now(),
-    is_banned  boolean   not null default false,
+    is_banned  boolean   not null default true,
     primary key (id)
 );
 

@@ -68,7 +68,7 @@ com
 (text, author_id)
 values ($1, $2) returning *`
 		crea := comment{}
-		err = db.GetContext(ctx, &crea, query, newcom.Text, newcom.AuthorID)
+		err := db.GetContext(ctx, &crea, query, newcom.Text, newcom.AuthorID)
 		if err != nil {
 			return fmt.Errorf("db.GetContext: %w", convertErr(err))
 		}

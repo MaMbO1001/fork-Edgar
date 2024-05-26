@@ -27,6 +27,7 @@ func TestRepo_Smoke(t *testing.T) {
 	assert.NoError(err)
 	assert.NotEmpty(comCreate.ID)
 	assert.NotEmpty(comCreate.TwitID)
+	assert.NotEmpty(comCreate.Text)
 	assert.NotEmpty(comCreate.CreatedAt)
 	assert.NotEmpty(comCreate.UpdatedAt)
 

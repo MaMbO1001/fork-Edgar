@@ -24,7 +24,6 @@ func (a *App) CreateTwit(ctx context.Context, session dom.Session, text string) 
 	return j, nil
 }
 
-// ЗАМЕТКА
 func (a *App) UpdateTwit(ctx context.Context, session dom.Session, text string, id uuid.UUID) (*Twit, error) {
 	t, err := a.repo.GetTwitByID(ctx, id)
 	if err != nil {

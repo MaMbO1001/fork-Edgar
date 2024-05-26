@@ -13,7 +13,7 @@ type (
 		Text      string    `db:"text" json:"text"`
 		CreatedAt time.Time `db:"created_at" json:"createdAt"`
 		UpdatedAt time.Time `db:"updated_at" json:"updatedAt"`
-		Is_banned bool      `db:"is_banned" json:"is_banned"`
+		IsBanned  bool      `db:"is_banned" json:"is_banned"`
 	}
 )
 
@@ -24,7 +24,7 @@ func convert(t app.Twit) *twit {
 		Text:      t.Text,
 		CreatedAt: t.CreatedAt,
 		UpdatedAt: t.UpdatedAt,
-		Is_banned: t.Is_banned,
+		IsBanned:  t.IsBanned,
 	}
 }
 
@@ -35,6 +35,6 @@ func (t twit) convert() *app.Twit {
 		Text:      t.Text,
 		CreatedAt: t.CreatedAt,
 		UpdatedAt: t.UpdatedAt,
-		Is_banned: t.Is_banned,
+		IsBanned:  t.IsBanned,
 	}
 }
