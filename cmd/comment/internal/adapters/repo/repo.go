@@ -65,10 +65,10 @@ func (j *Jopa) CreateCom(ctx context.Context, c app.Comment) (com *app.Comment, 
 		const query = `
 insert into
 com
-(text, author_id)
-values ($1, $2) returning *`
+(text, author_id, twit_id)
+values ($1, $2, $3) returning *`
 		crea := comment{}
-		err := db.GetContext(ctx, &crea, query, newcom.Text, newcom.AuthorID)
+		err := db.GetContext(ctx, &crea, query, newcom.Text, newcom.AuthorID, newcom.TwitID)
 		if err != nil {
 			return fmt.Errorf("db.GetContext: %w", convertErr(err))
 		}

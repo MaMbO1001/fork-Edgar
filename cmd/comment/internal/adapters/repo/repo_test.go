@@ -15,7 +15,7 @@ func TestRepo_Smoke(t *testing.T) {
 	ctx, j, assert := start(t)
 
 	com := app.Comment{
-		TwitID:    uuid.Nil,
+		TwitID:    uuid.Must(uuid.NewV4()),
 		AuthorID:  uuid.Must(uuid.NewV4()),
 		ID:        uuid.Nil,
 		Text:      "Hello Jopa Edgara",
