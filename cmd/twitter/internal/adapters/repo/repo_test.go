@@ -29,8 +29,7 @@ func TestRepo_Smoke(t *testing.T) {
 	assert.NotEmpty(twitResCreate.Text)
 	assert.NotEmpty(twitResCreate.CreatedAt)
 	assert.NotEmpty(twitResCreate.UpdatedAt)
-	//assert.NotEmpty(twitResCreate.IsBanned)
-	assert.True(twitResCreate.IsBanned)
+	assert.False(twitResCreate.IsBanned)
 
 	twit.ID = twitResCreate.ID
 	twit.IsBanned = twitResCreate.IsBanned

@@ -32,7 +32,7 @@ func (a *App) UpdateComment(ctx context.Context, session dom.Session, text strin
 		return nil, ErrAccessDenied
 	}
 	com.Text = text
-	cop, err := a.jopa.UpdateComment(ctx, Comment{Text: text, AuthorID: session.UserID})
+	cop, err := a.jopa.UpdateComment(ctx, *com)
 	if err != nil {
 		return cop, fmt.Errorf("a.jopa.UpdateComment: %w", err)
 	}
