@@ -27,6 +27,7 @@ import (
 )
 
 // For convenient testing.
+// Создаем интерфейс на основании методов которые у нас описаны в профто файле
 type application interface {
 	VerificationEmail(ctx context.Context, email string) error
 	VerificationUsername(ctx context.Context, username string) error
@@ -43,6 +44,7 @@ type application interface {
 	GetUsersByIDs(ctx context.Context, session dom.Session, ids []uuid.UUID) ([]app.User, error)
 }
 
+// Создаём структуру апи имеющую интерфейс который создали выше, и создааём мапу ключ значение
 type api struct {
 	app  application
 	auth map[string]bool
@@ -50,17 +52,19 @@ type api struct {
 
 // New creates and returns gRPC server.
 func New(ctx context.Context, m metrics.Metrics, applications application, reg *prometheus.Registry, namespace string) *grpc.Server {
+	//создаём переменную лог которая логирует все действия
 	log := logger.FromContext(ctx)
+	//стрнга с текстом апи
 	subsystem := "api"
-
+	//возвращает метрики сервера жрпс НЕ ПОНЯТНО
 	grpcMetrics := grpchelper.NewServerMetrics(reg, namespace, subsystem)
-
+	//НЕ ПОНЯТНО
 	srv, health := grpchelper.NewServer(m, log, grpcMetrics, apiError,
 		[]grpc.UnaryServerInterceptor{grpc_auth.UnaryServerInterceptor(nil)},   // Nil because we are using override.
 		[]grpc.StreamServerInterceptor{grpc_auth.StreamServerInterceptor(nil)}, // Nil because we are using override.
 	)
 	health.SetServingStatus(user_pb.UserExternalAPI_ServiceDesc.ServiceName, healthpb.HealthCheckResponse_SERVING)
-
+	//прокидываем срв, и инициализируем струтуру.
 	user_pb.RegisterUserExternalAPIServer(srv, &api{
 		app: applications,
 		auth: map[string]bool{
@@ -78,37 +82,40 @@ func New(ctx context.Context, m metrics.Metrics, applications application, reg *
 			"GetUsersByIDs":        true,
 		},
 	})
-
+	//возращаем срв
 	return srv
 }
 
+// создаём функцию которая сожержит инфу о запросе пользователя, ПОД ВОПРОСОМ
 func originFromCtx(ctx context.Context) (*dom.Origin, error) {
+	//фром контектс возвращает информацию в контексте если она существует
 	p, ok := peer.FromContext(ctx)
 	if !ok {
 		return nil, fmt.Errorf("peer.FromContext: %w", app.ErrNotFound)
 	}
-
+	//какие-то метаданные!?
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return nil, fmt.Errorf("metadata.FromIncomingContext: %w", app.ErrNotFound)
 	}
-
+	//хост разбивает сетевой адрес хост:порт
 	host, _, err := net.SplitHostPort(p.Addr.String())
 	if err != nil {
 		return nil, fmt.Errorf("net.SplitHostPort: %w", err)
 	}
-
+	//Пояснительная бригада, но как понял это для создания одной строки в которую будет помещён разделитель
 	clientUserAgent := strings.Join(md.Get(userAgentForward), "")
 	if clientUserAgent == "" {
 		clientUserAgent = strings.Join(md.Get(userAgent), "")
 	}
-
+	//вернём указатель на структуру дом.ориджин с полями айми и юсерагент
 	return &dom.Origin{
 		IP:        net.ParseIP(host),
 		UserAgent: clientUserAgent,
 	}, nil
 }
 
+// предположу что создаём функцию в которой инициализируем ошибки для удобного использования.????
 func apiError(err error) *status.Status {
 	if err == nil {
 		return nil

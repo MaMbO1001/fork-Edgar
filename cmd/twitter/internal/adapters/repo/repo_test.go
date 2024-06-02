@@ -70,4 +70,8 @@ func TestRepo_Smoke(t *testing.T) {
 	jopa, err := r.GetAllTwitWithJopa(ctx)
 	assert.NoError(err)
 	assert.Empty(jopa)
+
+	tota, err := r.GetTotalAllTwit(ctx)
+	assert.NoError(err)
+	assert.Empty(tota)
 }

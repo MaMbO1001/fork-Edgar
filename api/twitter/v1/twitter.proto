@@ -1,10 +1,14 @@
 syntax = "proto3";
 
-option go_package = "blablablashka/api/v1";
+package api.twitter.v1;
+option go_package = "github.com/ZergsLaw/back-template/api/twitter/v1;pb";
 
-package twit;
 import "google/rpc/code.proto";
 import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "api/annotations/v1/annotations.proto";
 
 message TwitByAuthorRequest {
   string author_id = 1;
@@ -62,7 +66,7 @@ message CreateTwitResponse {
 
 service Start {
   rpc TwitByAuthors(TwitByAuthorRequest) returns (TwitByAuthorResponse) {
-    option (google.api.http) = {get: "twit/api/v1/author"};
+    option (google.api.http) = {get: "/twit/api/v1/author"};
     option (api.annotations.v1.method_rule) = {
       codes: [
         INVALID_ARGUMENT,
@@ -73,7 +77,7 @@ service Start {
 
   rpc UpdateTwit(UpdateTwitRequest) returns (UpdateTwitResponse) {
     option (google.api.http) = {
-      put:"twit/api/v1/twit",
+      put:"/twit/api/v1/twit",
       body: "*"
     };
     option (api.annotations.v1.method_rule) = {
@@ -85,7 +89,7 @@ service Start {
   }
 
   rpc DeleteTwit(DeleteTwitRequest) returns (DeleteTwitResponse) {
-    option (google.api.http) = {delete: "twit/api/v1/delete"};
+    option (google.api.http) = {delete: "/twit/api/v1/delete"};
     option (api.annotations.v1.method_rule) = {
       codes: [
         INVALID_ARGUMENT,
